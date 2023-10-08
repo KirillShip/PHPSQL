@@ -1,4 +1,4 @@
 <?php
-    $_COOKIE = "";
-    header("Location: index.php");
+    setcookie('session', '', 1, '/');
+    header("Location: login.php");
 ?>

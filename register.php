@@ -18,11 +18,15 @@
     </body>
 </html>
 <?php
+    if(isset($_COOKIE['session'])){
+        setcookie('session', '', 1, '/');
+        unset($_COOKIE['session']);
+    }
     if($_POST != null) {
-        $host = "localhost";
+        $host = "127.0.0.1";
         $user = "root";
         $pass = "";
-        $db_name = "FirstDB";
+        $db_name = "data";
         $sql = mysqli_connect($host, $user, $pass, $db_name);
         if(!$sql) {
             die(mysqli_connect_error());
@@ -30,21 +34,21 @@
 
         $username = mysqli_real_escape_string($sql, $_POST["username"]);
         $password = mysqli_real_escape_string($sql, $_POST["password"]);
-        $password = hash("sha256", $password);
+        $password = password_hash($password, PASSWORD_DEFAULT);
 
-        $query = "SELECT * FROM `users` WHERE `username`='${username}'";
+        $query = "SELECT * FROM `users` WHERE username='${username}'";
         $result = mysqli_query($sql, $query);
         $result = mysqli_fetch_array($result);
         if($result) {
             header("Location: register.php");
         }
         else{
-            $query = "INSERT INTO `users`(`id`, `username`, `password`) VALUES (NULL,'${username}','${password}')";
+            $query = "INSERT INTO users(`id`, `username`, `passwd`) VALUES (NULL,'${username}','${password}')";
             $result = mysqli_query($sql, $query);
             if(!$result){
                 die(mysqli_error($sql));
             }
-            setcookie("session", "${username}".";"."${password}", time() + 2 * 24 * 60 * 60);
+            setcookie("session", "${username}".";"."${password}", time() + 2 * 24 * 60 * 60, "/");
             header("Location: menu.php");
         }
     }
